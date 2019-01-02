@@ -3,13 +3,18 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+#include <memory>
 #include "monitor.h"
 
 #define NUM_OF_APPLICANTS 30
 #define Q_SIZE    10
 mutex print_mutex, mtxAB, mtxCD;
 pthread_t U0_thread, U1_1_thread, U1_2_thread, U2_thread;
-Monitor *queue_A, *queue_B, *queue_C, *queue_D;
+//Monitor *queue_A, *queue_B, *queue_C, *queue_D;
+shared_ptr<Monitor> queue_A(new Monitor(Q_SIZE));
+shared_ptr<Monitor> queue_B(new Monitor(Q_SIZE));
+shared_ptr<Monitor> queue_C(new Monitor(Q_SIZE));
+shared_ptr<Monitor> queue_D(new Monitor(Q_SIZE));
 condition_variable queuesAB_full, queuesCD_empty;
 
 using namespace std;
@@ -18,11 +23,12 @@ using namespace std;
 void clean_up() {
   pthread_kill(U1_1_thread, 9);
   pthread_kill(U1_2_thread, 9);
-
+/*
   delete queue_A;
   delete queue_B;
   delete queue_C;
   delete queue_D;
+  */
 }
 //Prints all given queues aka simlation
 void print_all() {
@@ -177,16 +183,17 @@ void* process_U2(void*) {
 }
 //Initialize queues, threads
 void init_all() {
+  /*
   queue_A = new Monitor(Q_SIZE);
   queue_B = new Monitor(Q_SIZE);
   queue_C = new Monitor(Q_SIZE);
   queue_D = new Monitor(Q_SIZE);
+  */
 
   pthread_create(&U0_thread, NULL, &process_U0, NULL);
   pthread_create(&U1_1_thread, NULL, &process_U1_1, NULL);
   pthread_create(&U1_2_thread, NULL, &process_U1_2, NULL);
   pthread_create(&U2_thread, NULL, &process_U2, NULL);
-
 }
 
 //Start threads
